@@ -25,7 +25,6 @@ def load_subscriptions():
 		save_subscriptions({})
 	
 	subs = json.load(open(subfile))
-	print subs
 	return subs
 
 def save_subscriptions(subs):
@@ -66,7 +65,7 @@ def subscribe(feed_url):
 	save_subscriptions(subs)
 	
 	print 'Downloading latest item'
-	url = podcast.items[1].enclosure_url
+	url = podcast.items[0].enclosure_url
 	#download(podcast.title, url)
 
 def folder_for_feed(feed_name):
@@ -100,7 +99,21 @@ def download(feed_name, item_url):
 					f.write(chunk)
 					# f.flush()
 		return local_filename
-	
+
+########################################
+## Refreshing Feeds
+########################################
+def refresh():
+    subs = load_subscriptions()
+    for sub in subs:
+        print sub
+
+def refresh_feed(feed_url):
+    subs = load_subscriptions()
+    etag = etag_for_sub(subs, feed_url)
+
+
+
 def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-r', '--refresh', help='Refresh subscriptions', action='store_true')
@@ -112,6 +125,7 @@ def main():
 		
 	if args.refresh:
 		print 'Refreshing feeds.'
+                refresh()
 	
 if __name__ == "__main__":
 	main()
