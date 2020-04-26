@@ -14,10 +14,15 @@ def usage():
 	print "Usage: ppod [-rh]"   
 
 def load_settings():
-	return {}
+	conf = './.ppod.conf'
+	if not path.exists(conf):
+		save_settings({})
+	
+	conf = json.load(open(conf))
+	return conf
 
 def save_settings(settings):
-	print 'save settings'
+	json.dump(settings, open('./.ppod.conf', 'w'))
 
 #################################
 # Functions to manage subscriptions
@@ -34,7 +39,6 @@ def load_subscriptions():
 
 # Saves a dictionary of subscriptions
 def save_subscriptions(subs):
-	print 'save_subscriptions'
 	json.dump(subs, open('./.subs', 'w'))
 
 # Adds a subscription with optional etag and last modified time
@@ -95,7 +99,7 @@ def subscribe(feed_url):
 	subs = load_subscriptions()
 	add_subscription(subs, podcast.title, feed_url, etag, last_modified)
 	save_subscriptions(subs)
-	print 'Subscribed'	
+	print 'Subscribed.'
 
 # Lists Subscriptions
 def list_subscriptions():
@@ -112,12 +116,17 @@ def unsubscribe(index):
 	save_subscriptions(subs)
 
 def folder_for_feed(feed_name):
-	local_folder_name = './' + feed_name
+	subfolder = './'
+	settings = load_settings()
+	if settings.get('media_dir'):
+		subfolder = settings['media_dir']
+		
+	local_folder_name = subfolder + feed_name
 	
 	# Does the folder not exist? Create it.
 	if not path.exists(local_folder_name):
 		try:
-			os.mkdir(local_folder_name)
+			os.makedirs(local_folder_name)
 		except OSError:
 			print 'Creation of feed directory %s failed.' % local_folder_name
 			sys.exit(2)
@@ -125,9 +134,6 @@ def folder_for_feed(feed_name):
 
 
 def local_filename_for_feed_item(feed_name, item_url, item_title, item_datetime):
-	print 'Calculating local file name.'
-	print 'Pub Date: ' + item_datetime.strftime('%Y-%m-%d')
-	
 	folder = folder_for_feed(feed_name)
 	source_file_name = item_url.split('/')[-1].split('?')[0]
 	source_extension = source_file_name.split('.')[-1]
