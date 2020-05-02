@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/python
 
 import argparse, sys
 from pyPodcastParser.Podcast import Podcast
@@ -140,7 +140,6 @@ def local_filename_for_feed_item(feed_name, item_url, item_title, item_datetime)
 	
 	cleaned_title = item_title.replace(':', '-')
 	local_filename = '%s/%s - %s.%s' % (folder, item_datetime.strftime('%Y-%m-%d'), cleaned_title, source_extension)
-	print 'Local filename %s' % local_filename
 	return local_filename
 
 # Downloads a given item from a feed.
@@ -202,8 +201,6 @@ def download_new_episodes(podcast, limit=-1):
 		if not path.exists(local_file):
 			print 'Downloading episode: %s (%s)' % (podcast.items[i].title, item.date_time.isoformat())
 			download(podcast.title, podcast.items[i])
-		else:
-			print 'File exists. Skipping.'
 
 def main():
 	parser = argparse.ArgumentParser()
